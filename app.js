@@ -4,9 +4,12 @@
 // ---------- Screen switching ----------
 const screens = document.querySelectorAll(".screen");
 const navBtns = document.querySelectorAll(".switcher button");
+// Which product-nav section each screen lives in (rail is product chrome).
+const NAV_FOR = { s1: "tasks", s2: "tasks", s3: "briefs" };
 function go(id) {
   screens.forEach(s => s.classList.toggle("active", s.id === id));
   navBtns.forEach(b => b.classList.toggle("active", b.dataset.go === id));
+  document.querySelectorAll(".nav-item").forEach(a => a.classList.toggle("on", a.dataset.nav === NAV_FOR[id]));
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 document.querySelectorAll("[data-go]").forEach(el => el.addEventListener("click", () => go(el.dataset.go)));
@@ -54,10 +57,14 @@ function renderTasks(role) {
     card.className = "task";
     card.innerHTML = `
       <span class="tag">${t.tag}</span>
-      <h3>${t.title}</h3>
-      <p>${t.desc}</p>
-      <div class="doc">📄 <span>${t.doc}</span> · <span class="pg">${t.pg}</span></div>
-      <div class="run">Run this task →</div>`;
+      <span class="t-main">
+        <h3>${t.title}</h3>
+        <p>${t.desc}</p>
+      </span>
+      <span class="t-side">
+        <span class="doc">${t.doc} · <span class="pg">${t.pg}</span></span>
+        <span class="run">Run this task →</span>
+      </span>`;
     // The primary extraction task leads into the S2 result we built.
     card.addEventListener("click", () => go("s2"));
     tasksEl.appendChild(card);
