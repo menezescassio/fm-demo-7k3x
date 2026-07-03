@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>First Monday: Shift Copilot</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;550;600;650;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <!-- Product top bar -->
+  <div class="topbar">
+    <div class="brand">
+      <span class="mark">S</span> Shift Copilot
+      <span class="sub">First Monday</span>
+    </div>
+    <div class="account-chip"><span class="dot"></span> Ferro Imóveis · 8 docs connected</div>
+  </div>
+
+  <!-- Prototype scaffolding: screen switcher (not product chrome) -->
+  <div class="switcher">
+    <button data-go="s1" class="active"><span class="n">S1</span>First session</button>
+    <button data-go="s2"><span class="n">S2</span>Result + install</button>
+    <button data-go="s3"><span class="n">S3</span>Monday recap</button>
+  </div>
+
+  <div class="stage">
+
+    <!-- ============ S1: role-scoped starter tasks ============ -->
+    <section id="s1" class="screen active">
+      <div class="eyebrow">First login</div>
+      <h1 class="title">Let's get one real thing done in the next 3 minutes.</h1>
+      <p class="lede">Copilot already read the documents connected to Ferro Imóveis. Pick your role and it will suggest three tasks it can finish right now, on your own files. No blank box, no prompt to invent.</p>
+
+      <div class="role-row" id="roles">
+        <button class="role sel" data-role="broker"><span class="ico">🏠</span> Broker / Agent <span class="from-invite">from your invite</span></button>
+        <button class="role" data-role="listing"><span class="ico">📋</span> Listing Manager</button>
+        <button class="role" data-role="legal"><span class="ico">⚖️</span> Contracts &amp; Legal</button>
+      </div>
+
+      <div class="tasks-head">
+        <h2>Starter tasks for a <span id="role-name">Broker / Agent</span></h2>
+        <div class="ctx">Scoped to real estate · grounded in your connected files</div>
+      </div>
+      <div class="task-grid" id="tasks"></div>
+
+      <p class="blank-note"><b>What this replaces:</b> today a new seat lands on an empty prompt and a blinking cursor. 50.6% of Mid-Market and SMB seats never reach first value in week one, and the median churned seat lives just two weeks. First Monday removes the blank box.</p>
+    </section>
+
+    <!-- ============ S2: result with sources + install moment ============ -->
+    <section id="s2" class="screen">
+      <button class="back" data-go="s1">← Back to starter tasks</button>
+      <div class="eyebrow">First value</div>
+      <h1 class="title">Your rent-review summary is ready.</h1>
+      <p class="lede">Every figure below links to the exact page it came from. Copilot only summarized what your documents say; nothing here is invented.</p>
+
+      <div class="result-card">
+        <div class="result-head">
+          <div class="q">Task: <b>Summarize upcoming rent reviews across my active leases</b></div>
+          <div class="ok">✓ Done in 41s</div>
+        </div>
+        <div class="result-body">
+          <p>Three of your six active commercial leases have a rent review clause triggering in the next 90 days. Two are index-linked (IGP-M), one is a fixed 8% step.</p>
+          <div class="row"><div class="k">Av. Paulista, 1842 · Unit 12</div><div class="v">Review 14 Aug · IGP-M + 0% floor <span class="cite" title="Source: lease_paulista_1842.pdf, clause 7.2">lease_paulista_1842.pdf · p.9</span></div></div>
+          <div class="row"><div class="k">R. Oscar Freire, 300</div><div class="v">Review 02 Sep · fixed +8% <span class="cite" title="Source: lease_oscarfreire_300.pdf, clause 5.1">lease_oscarfreire_300.pdf · p.4</span></div></div>
+          <div class="row"><div class="k">Faria Lima, 4055 · Floor 7</div><div class="v">Review 28 Sep · IGP-M + 0% floor <span class="cite" title="Source: lease_farialima_4055.pdf, clause 7.2">lease_farialima_4055.pdf · p.11</span></div></div>
+        </div>
+        <div class="sources">
+          <h4>Sources · 3 documents cited</h4>
+          <ol>
+            <li><b>lease_paulista_1842.pdf</b>, clause 7.2 (Reajuste), page 9</li>
+            <li><b>lease_oscarfreire_300.pdf</b>, clause 5.1 (Correção monetária), page 4</li>
+            <li><b>lease_farialima_4055.pdf</b>, clause 7.2 (Reajuste), page 11</li>
+          </ol>
+        </div>
+      </div>
+
+      <!-- The install moment: this click produces Assumption 1 and feeds Assumption 2 -->
+      <div class="install" id="install">
+        <div class="txt">
+          <h3>Make this my Monday morning brief</h3>
+          <p>Copilot will re-run this every Monday at 8:00 and send you the leases that changed, before you have to ask. One click, cancel anytime.</p>
+        </div>
+        <button id="install-btn">Install weekly brief</button>
+      </div>
+    </section>
+
+    <!-- ============ S3: Monday recap (with dormant critical state) ============ -->
+    <section id="s3" class="screen">
+      <div class="eyebrow">The habit</div>
+      <h1 class="title">The Monday recap.</h1>
+      <p class="lede">The installed job runs itself and lands every Monday. The dormant variant is what pulls back a seat that stopped showing up, without a human in the loop.</p>
+
+      <div class="variant-toggle" id="variant">
+        <button class="on" data-var="live">Active seat</button>
+        <button data-var="dormant">Dormant seat · critical state</button>
+      </div>
+
+      <div id="recap"></div>
+      <p class="foot-note" id="recap-foot"></p>
+
+      <div class="cap">
+        <b>Why the dormant variant is the lever:</b> 439 Mid-Market and SMB seats are churned but still under contract. The recap reaches them with a finished deliverable, not a "we miss you" nudge. At an 8% return rate that is 35 seats reactivated inside 90 days.
+      </div>
+    </section>
+
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
