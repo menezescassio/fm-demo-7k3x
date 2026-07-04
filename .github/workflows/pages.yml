@@ -1,0 +1,76 @@
+name: Deploy GitHub Pages (coexist)
+
+# Publishes BOTH builds so the old and new versions coexist:
+#   deploy.config promoteToRoot=false (default) → OLD at "/", NEW at "/next/"
+#   deploy.config promoteToRoot=true            → NEW at "/", OLD at "/legacy/"
+# The old static files at the repo root are never modified — only copied into
+# the published artifact — so a revert is a one-line flip of deploy.config.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build-deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: app/package-lock.json
+
+      - name: Install deps
+        working-directory: app
+        run: npm ci
+
+      - name: Read promote flag
+        id: cfg
+        run: |
+          PROMOTE=$(node -e "console.log(require('./deploy.config').promoteToRoot === true)")
+          echo "promote=$PROMOTE" >> "$GITHUB_OUTPUT"
+          echo "promoteToRoot=$PROMOTE"
+
+      - name: Build app
+        working-directory: app
+        env:
+          DEPLOY_BASE: ${{ steps.cfg.outputs.promote == 'true' && '/fm-demo-7k3x/' || '/fm-demo-7k3x/next/' }}
+        run: npm run build
+
+      - name: Assemble site (coexist)
+        run: |
+          set -eux
+          rm -rf _site && mkdir -p _site
+          if [ "${{ steps.cfg.outputs.promote }}" = "true" ]; then
+            # PROMOTED: new build at root, old version preserved under /legacy/
+            cp -R app/dist/. _site/
+            mkdir -p _site/legacy
+            cp index.html app.js styles.css README.md _site/legacy/
+          else
+            # DEFAULT: old version unchanged at root, new build under /next/
+            cp index.html app.js styles.css README.md _site/
+            mkdir -p _site/next
+            cp -R app/dist/. _site/next/
+          fi
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+      - id: deploy
+        uses: actions/deploy-pages@v4
