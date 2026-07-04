@@ -65,8 +65,8 @@ function renderTasks(role) {
         <span class="doc">${t.doc} · <span class="pg">${t.pg}</span></span>
         <span class="run">Run this task →</span>
       </span>`;
-    // The primary extraction task leads into the S2 result we built.
-    card.addEventListener("click", () => go("s2"));
+    // Each role's card opens the result screen for that role's primary task.
+    card.addEventListener("click", () => { renderS2(role); go("s2"); });
     tasksEl.appendChild(card);
   });
 }
@@ -81,9 +81,99 @@ document.querySelectorAll(".role").forEach(btn => {
 });
 renderTasks("broker");
 
+// ---------- S1 -> S2: role-appropriate result ----------
+// Each role's primary starter task lands on its own result. Broker (rent
+// reviews) is the default; listing and legal get their own extraction result.
+// Titles/ledes/result-card are swapped; the install moment below is shared.
+const s2Title = document.getElementById("s2-title");
+const s2Lede = document.getElementById("s2-lede");
+const s2Result = document.getElementById("s2-result");
+
+const S2_RESULTS = {
+  broker: {
+    title: "Your rent-review summary is ready.",
+    lede: "Every figure below links to the exact page it came from. Copilot only summarized what your documents say; nothing here is invented.",
+    card: `
+      <div class="result-head">
+        <div class="q">Task: <b>Summarize upcoming rent reviews across my active leases</b></div>
+        <div class="ok">✓ Done in about 2 min</div>
+      </div>
+      <div class="result-body">
+        <p>Three of your six active commercial leases have a rent review clause triggering in the next 90 days. Two are index-linked (IGP-M), one is a fixed 8% step.</p>
+        <div class="rows">
+          <div class="row"><div class="k">Av. Paulista, 1842 · Unit 12</div><div class="v">Review 14 Aug · IGP-M + 0% floor <span class="cite" title="Source: lease_paulista_1842.pdf, clause 7.2">lease_paulista_1842.pdf · p.9</span></div></div>
+          <div class="row"><div class="k">R. Oscar Freire, 300</div><div class="v">Review 02 Sep · fixed +8% <span class="cite" title="Source: lease_oscarfreire_300.pdf, clause 5.1">lease_oscarfreire_300.pdf · p.4</span></div></div>
+          <div class="row"><div class="k">Faria Lima, 4055 · Floor 7</div><div class="v">Review 28 Sep · IGP-M + 0% floor <span class="cite" title="Source: lease_farialima_4055.pdf, clause 7.2">lease_farialima_4055.pdf · p.11</span></div></div>
+        </div>
+      </div>
+      <div class="sources">
+        <h4>Sources · 3 documents cited</h4>
+        <ol>
+          <li><b>lease_paulista_1842.pdf</b>, clause 7.2 (Reajuste), page 9</li>
+          <li><b>lease_oscarfreire_300.pdf</b>, clause 5.1 (Correção monetária), page 4</li>
+          <li><b>lease_farialima_4055.pdf</b>, clause 7.2 (Reajuste), page 11</li>
+        </ol>
+      </div>`,
+  },
+  listing: {
+    title: "Your condo-fee gap list is ready.",
+    lede: "Every listing below links to the row it came from. Copilot only flagged what your data shows; nothing here is invented.",
+    card: `
+      <div class="result-head">
+        <div class="q">Task: <b>Pull every listing missing a condo fee this week</b></div>
+        <div class="ok">✓ Done in about 90s</div>
+      </div>
+      <div class="result-body">
+        <p>Of 142 active listings, three are missing a condo fee and two more carry a stale value from before this year. Portals de-rank listings without it.</p>
+        <div class="rows">
+          <div class="row"><div class="k">R. Haddock Lobo, 585 · Apto 72</div><div class="v">Condo fee field empty <span class="cite" title="Source: listings_active.csv, row 14">listings_active.csv · row 14</span></div></div>
+          <div class="row"><div class="k">Av. Rebouças, 3970 · Sala 21</div><div class="v">Condo fee field empty <span class="cite" title="Source: listings_active.csv, row 66">listings_active.csv · row 66</span></div></div>
+          <div class="row"><div class="k">R. Augusta, 1508 · Loja 3</div><div class="v">Stale fee from 2024 <span class="cite" title="Source: listings_active.csv, row 91">listings_active.csv · row 91</span></div></div>
+        </div>
+      </div>
+      <div class="sources">
+        <h4>Sources · 1 file cited</h4>
+        <ol>
+          <li><b>listings_active.csv</b>, 142 rows scanned; rows 14, 66 and 91 flagged</li>
+        </ol>
+      </div>`,
+  },
+  legal: {
+    title: "Your renewal and exit windows are ready.",
+    lede: "Every date below links to the exact clause it came from. Copilot only summarized what your contracts say; nothing here is invented.",
+    card: `
+      <div class="result-head">
+        <div class="q">Task: <b>List all renewal and exit windows closing this quarter</b></div>
+        <div class="ok">✓ Done in about 2 min</div>
+      </div>
+      <div class="result-body">
+        <p>Across your 12 active contracts, three notice windows close this quarter. Miss the date and the term renews automatically.</p>
+        <div class="rows">
+          <div class="row"><div class="k">Faria Lima, 4055 · Floor 7</div><div class="v">Renewal notice due 30 Aug <span class="cite" title="Source: lease_farialima_4055.pdf, clause 12.1">lease_farialima_4055.pdf · p.14</span></div></div>
+          <div class="row"><div class="k">Av. Paulista, 1842 · Unit 12</div><div class="v">Exit window closes 15 Sep <span class="cite" title="Source: lease_paulista_1842.pdf, clause 11.3">lease_paulista_1842.pdf · p.12</span></div></div>
+          <div class="row"><div class="k">R. Oscar Freire, 300</div><div class="v">Renewal notice due 28 Sep <span class="cite" title="Source: lease_oscarfreire_300.pdf, clause 9.2">lease_oscarfreire_300.pdf · p.7</span></div></div>
+        </div>
+      </div>
+      <div class="sources">
+        <h4>Sources · 3 documents cited</h4>
+        <ol>
+          <li><b>lease_farialima_4055.pdf</b>, clause 12.1 (Renovação), page 14</li>
+          <li><b>lease_paulista_1842.pdf</b>, clause 11.3 (Rescisão), page 12</li>
+          <li><b>lease_oscarfreire_300.pdf</b>, clause 9.2 (Renovação), page 7</li>
+        </ol>
+      </div>`,
+  },
+};
+
+function renderS2(role) {
+  const r = S2_RESULTS[role] || S2_RESULTS.broker;
+  s2Title.textContent = r.title;
+  s2Lede.textContent = r.lede;
+  s2Result.innerHTML = r.card;
+}
+
 // ---------- S2: install moment ----------
-// This click is Assumption 1 made real (a seat installs a recurring job in
-// session 1) and it feeds Assumption 2 (the recap that lifts W8|FV7).
+// The install button turns the just-finished task into a recurring weekly job.
 const install = document.getElementById("install");
 const installBtn = document.getElementById("install-btn");
 installBtn.addEventListener("click", () => {
@@ -119,9 +209,9 @@ const RECAPS = {
           </ul>
         </div>
         <div class="stat-strip">
-          <div class="stat"><div class="num">6</div><div class="lbl">briefs delivered</div></div>
-          <div class="stat"><div class="num green">3.4 h</div><div class="lbl">time saved to date</div></div>
-          <div class="stat"><div class="num">18</div><div class="lbl">clauses checked</div></div>
+          <div class="stat"><div class="num">4</div><div class="lbl">briefs this month</div></div>
+          <div class="stat"><div class="num green">~3 h</div><div class="lbl">saved so far</div></div>
+          <div class="stat"><div class="num">12</div><div class="lbl">clauses checked</div></div>
         </div>
         <div class="next-task">
           <div class="t"><b>One thing to try next</b>Draft the Oscar Freire response letter from the notice and your template.</div>
@@ -170,14 +260,16 @@ document.querySelectorAll("#variant button").forEach(b => {
 });
 renderRecap("live");
 
-// ---------- Deterministic initial state via URL params (for screenshots) ----------
-// e.g. ?screen=s2&installed=1  or  ?screen=s3&var=dormant  or  ?screen=s1&role=legal
+// ---------- Optional deep-link state via URL params ----------
+// Lets a link open a specific screen/role/variant, e.g.
+// ?screen=s2&installed=1  or  ?screen=s3&var=dormant  or  ?screen=s1&role=legal
 (function applyUrlState() {
   const p = new URLSearchParams(location.search);
   const role = p.get("role");
   if (role && TASKS[role]) {
     document.querySelectorAll(".role").forEach(b => b.classList.toggle("sel", b.dataset.role === role));
     renderTasks(role);
+    renderS2(role);
   }
   if (p.get("installed") === "1") installBtn.click();
   const v = p.get("var");

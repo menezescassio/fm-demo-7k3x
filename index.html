@@ -86,13 +86,13 @@
       <section id="s2" class="screen">
         <button class="back" data-go="s1">← Back to starter tasks</button>
         <div class="eyebrow">First value</div>
-        <h1 class="title">Your rent-review summary is ready.</h1>
-        <p class="lede">Every figure below links to the exact page it came from. Copilot only summarized what your documents say; nothing here is invented.</p>
+        <h1 class="title" id="s2-title">Your rent-review summary is ready.</h1>
+        <p class="lede" id="s2-lede">Every figure below links to the exact page it came from. Copilot only summarized what your documents say; nothing here is invented.</p>
 
-        <div class="result-card">
+        <div class="result-card" id="s2-result">
           <div class="result-head">
             <div class="q">Task: <b>Summarize upcoming rent reviews across my active leases</b></div>
-            <div class="ok">✓ Done in 41s</div>
+            <div class="ok">✓ Done in about 2 min</div>
           </div>
           <div class="result-body">
             <p>Three of your six active commercial leases have a rent review clause triggering in the next 90 days. Two are index-linked (IGP-M), one is a fixed 8% step.</p>
@@ -112,7 +112,7 @@
           </div>
         </div>
 
-        <!-- The install moment: this click produces Assumption 1 and feeds Assumption 2 -->
+        <!-- Install moment: converts the finished task into a recurring weekly job -->
         <div class="install" id="install">
           <div class="txt">
             <h3>Make this my Monday morning brief</h3>
