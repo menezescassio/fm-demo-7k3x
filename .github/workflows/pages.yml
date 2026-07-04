@@ -42,7 +42,7 @@ jobs:
       - name: Read promote flag
         id: cfg
         run: |
-          PROMOTE=$(node -e "console.log(require('./deploy.config').promoteToRoot === true)")
+          PROMOTE=$(node -e "console.log(JSON.parse(require('fs').readFileSync('./deploy.config','utf8')).promoteToRoot === true)")
           echo "promote=$PROMOTE" >> "$GITHUB_OUTPUT"
           echo "promoteToRoot=$PROMOTE"
 
