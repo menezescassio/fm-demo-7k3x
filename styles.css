@@ -110,6 +110,8 @@ button { font-family: var(--sans); }
   border-left: 2px solid var(--green);
   box-shadow: 0 0 0 1px var(--line-soft);
 }
+.nav-item[data-go] { cursor: pointer; }
+.nav-item.muted { opacity: .45; pointer-events: none; }
 
 .docs { margin-top: auto; border-top: 1px solid var(--line); padding-top: 14px; }
 .docs ul { margin: 0; padding: 0; list-style: none; }

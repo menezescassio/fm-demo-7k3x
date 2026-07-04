@@ -12,7 +12,7 @@ function go(id) {
   document.querySelectorAll(".nav-item").forEach(a => a.classList.toggle("on", a.dataset.nav === NAV_FOR[id]));
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
-document.querySelectorAll("[data-go]").forEach(el => el.addEventListener("click", () => go(el.dataset.go)));
+document.querySelectorAll("[data-go]").forEach(el => el.addEventListener("click", (e) => { e.preventDefault(); go(el.dataset.go); }));
 
 // ---------- S1: role -> starter tasks ----------
 // Tasks are curated toward reliable extraction-style work (sources shown),
